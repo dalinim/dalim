@@ -273,6 +273,8 @@ elif defined(windows):
         cprintf "virtualFree failing!"
         quit 1
     #VirtualFree(p, size, MEM_DECOMMIT)
+elif defined(dex):
+  proc vi
 
 elif hostOS == "standalone":
   const StandaloneHeapSize {.intdefine.}: int = 1024 * PageSize

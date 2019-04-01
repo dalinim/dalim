@@ -31,8 +31,9 @@ type
     vm,                        ## Some Virtual machine: Nim's VM or JavaScript
     avr,                       ## AVR based processor
     msp430,                    ## TI MSP430 microcontroller
-    riscv64                    ## RISC-V 64-bit processor
-    wasm32                     ## WASM, 32-bit
+    riscv64,                   ## RISC-V 64-bit processor
+    wasm32,                    ## WASM, 32-bit
+    dex                        ## Dalvik bytecode
 
   OsPlatform* {.pure.} = enum ## the OS this program will run on.
     none, dos, windows, os2, linux, morphos, skyos, solaris,

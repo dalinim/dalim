@@ -19,7 +19,8 @@ import
   cgen, json, nversion,
   platform, nimconf, importer, passaux, depends, vm, vmdef, types, idgen,
   parser, modules, ccgutils, sigmatch, ropes,
-  modulegraphs, tables, rod, lineinfos, pathutils
+  modulegraphs, tables, rod, lineinfos, pathutils,
+  dexgen
 
 when not defined(leanCompiler):
   import jsgen, docgen, docgen2
@@ -134,8 +135,10 @@ proc commandCompileToDEX(graph: ModuleGraph) =
   # TODO Does osDEX make sense here? 
   # is this function necessery
   setTarget(graph.config.target, osDEX, cpuDEX)
+  # register symbols??
 
   semanticPasses(graph)
+  registerPass(graph,DEXgenPass)
 
   compileProject(graph)
 
