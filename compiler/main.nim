@@ -123,6 +123,22 @@ when not defined(leanCompiler):
     if optGenScript in graph.config.globalOptions:
       writeDepsFile(graph)
 
+proc commandCompileToDEX(graph: ModuleGraph) =
+  let conf = graph.config
+
+  if conf.outDir.isEmpty:
+    conf.outDir = conf.projectPath
+  if conf.outFile.isEmpty:
+    conf.outFile = RelativeFile(conf.projectName & ".dex")
+
+  # TODO Does osDEX make sense here? 
+  # is this function necessery
+  setTarget(graph.config.target, osDEX, cpuDEX)
+
+  semanticPasses(graph)
+
+  compileProject(graph)
+
 proc interactivePasses(graph: ModuleGraph) =
   initDefines(graph.config.symbols)
   defineSymbol(graph.config.symbols, "nimscript")
@@ -219,6 +235,12 @@ proc mainCommand*(graph: ModuleGraph) =
         # A better solution might be to fix system.nim
         undefSymbol(conf.symbols, "useNimRtl")
       commandCompileToJS(graph)
+  of "dex":
+    when defined(leanCompiler):
+      quit "compiler wasn't built with dex code generator"
+    else:
+      conf.cmd = cmdCompileToDEX
+      commandCompileToDEX(graph)
   of "doc0":
     when defined(leanCompiler):
       quit "compiler wasn't built with documentation generator"

@@ -107,7 +107,8 @@ type
     cmdRst2tex,               # convert a reStructuredText file to TeX
     cmdInteractive,           # start interactive session
     cmdRun,                   # run the project via TCC backend
-    cmdJsonScript             # compile a .json build file
+    cmdJsonScript,            # compile a .json build file
+    cmdCompileToDEX           # compile a .dex assembly file
   TStringSeq* = seq[string]
   TGCMode* = enum             # the selected GC
     gcNone, gcBoehm, gcRegions, gcMarkAndSweep, gcDestructors,
