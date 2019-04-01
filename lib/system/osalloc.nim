@@ -274,7 +274,19 @@ elif defined(windows):
         quit 1
     #VirtualFree(p, size, MEM_DECOMMIT)
 elif defined(dex):
-  proc vi
+  proc osAllocPages(size:int): pointer {.inline.} =
+    # FIXME
+    echo "DEX Stub osAllocPages"
+    result = cast[pointer](0)
+
+  proc osTryAllocPages(size: int): pointer {.inline.} =
+    # FIXME 
+    echo "Dex Stub osTryAllocPages"
+    result = cast[pointer](0)
+
+  proc osDeallocPages(p: pointer, size: int) {.inline.} =
+    # FIXME 
+    echo "DEX Stub osDeallocPages"
 
 elif hostOS == "standalone":
   const StandaloneHeapSize {.intdefine.}: int = 1024 * PageSize
