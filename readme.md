@@ -17,16 +17,6 @@ The aims are currently humble, and consist of firstly compiling simple programs.
 
 ## Compiling
 
-The compiler currently officially supports the following platform and
-architecture combinations:
-
-  * Windows (Windows XP or greater) - x86 and x86_64
-  * Linux (most, if not all, distributions) - x86, x86_64, ppc64 and armv6l
-  * Mac OS X (10.04 or greater) - x86, x86_64 and ppc64
-
-More platforms are supported, however they are not tested regularly and they
-may not be as stable as the above-listed platforms.
-
 Compiling the Nim compiler is quite straightforward if you follow these steps:
 
 First, the C source of an older version of the Nim compiler is needed to
@@ -97,44 +87,13 @@ within the [doc/koch.rst](doc/koch.rst) file.
 ``nimble`` is Nim's package manager. To learn more about it, see the
 [``nim-lang/nimble``][nimble-repo] repository.
 
-## Contributors
+## Usage 
 
-This project exists thanks to all the people who contribute.
-<a href="https://github.com/nim-lang/Nim/graphs/contributors"><img src="https://opencollective.com/Nim/contributors.svg?width=890" /></a>
+Bear in mind that this is work in progress, but the usage will be something along these lines. 
 
-## Contributing
+``bin/nim dex fib.nim`` 
 
-[![Backers on Open Collective](https://opencollective.com/nim/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/nim/sponsors/badge.svg)](#sponsors)
-[![Setup a bounty via Bountysource][badge-nim-bountysource]][nim-bountysource]
-[![Donate Bitcoins][badge-nim-bitcoin]][nim-bitcoin]
-[![Open Source Helpers](https://www.codetriage.com/nim-lang/nim/badges/users.svg)](https://www.codetriage.com/nim-lang/nim)
-
-See [detailed contributing guidelines](https://nim-lang.github.io/Nim/contributing.html).
-We welcome all contributions to Nim regardless of how small or large
-they are. Everything from spelling fixes to new modules to be included in the
-standard library are welcomed and appreciated. Before you start contributing,
-you should familiarize yourself with the following repository structure:
-
-* ``bin/``, ``build/`` - these directories are empty, but are used when Nim is built.
-* ``compiler/`` - the compiler source code. Also includes nimfix, and plugins within
-  ``compiler/nimfix`` and ``compiler/plugins`` respectively.
-* ``nimsuggest`` - the nimsuggest tool that previously lived in the [``nim-lang/nimsuggest``][nimsuggest-repo] repository. 
-* ``config/`` - the configuration for the compiler and documentation generator.
-* ``doc/`` - the documentation files in reStructuredText format.
-* ``lib/`` - the standard library, including:
-    * ``pure/`` - modules in the standard library written in pure Nim.
-    * ``impure/`` - modules in the standard library written in pure Nim with
-    dependencies written in other languages.
-    * ``wrappers/`` - modules which wrap dependencies written in other languages.
-* ``tests/`` - contains categorized tests for the compiler and standard library.
-* ``tools/`` - the tools including ``niminst`` and ``nimweb`` (mostly invoked via
-  ``koch``).
-* ``koch.nim`` - tool used to bootstrap Nim, generate C sources, build the website,
-  and generate the documentation.
-
-If you are not familiar with making a pull request using GitHub and/or git, please
-read [this guide][pull-request-instructions].
-
+Currently prints out a subset of the AST. More to come shortly!
 
 ## License
 The compiler and the standard library are licensed under the MIT license, except
