@@ -134,13 +134,13 @@ proc commandCompileToDEX(graph: ModuleGraph) =
 
   # TODO Does osDEX make sense here? 
   # is this function necessery
-  setTarget(graph.config.target, osDEX, cpuDEX)
+#  setTarget(graph.config.target, osDEX, cpuDEX)
   # register symbols??
 
-  semanticPasses(graph)
+#  semanticPasses(graph)
   registerPass(graph,DEXgenPass)
 
-  compileProject(graph)
+  compileProjectDEX(graph)
 
 proc interactivePasses(graph: ModuleGraph) =
   initDefines(graph.config.symbols)
@@ -203,7 +203,7 @@ proc mainCommand*(graph: ModuleGraph) =
   # In "nim serve" scenario, each command must reset the registered passes
   clearPasses(graph)
   conf.lastCmdTime = epochTime()
-  conf.searchPaths.add(conf.libpath)
+#  conf.searchPaths.add(conf.libpath)
   setId(100)
   case conf.command.normalize
   of "c", "cc", "compile", "compiletoc":

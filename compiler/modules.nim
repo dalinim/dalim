@@ -123,6 +123,23 @@ proc wantMainModule*(conf: ConfigRef) =
         "command expects a filename")
   conf.projectMainIdx = fileInfoIdx(conf, addFileExt(conf.projectFull, NimExt))
 
+# Compile w/o systems module
+proc compileProjectDEX*(graph: ModuleGraph; projectFileIdx = InvalidFileIDX) =
+  echo "DEX: compile project"
+#  connectCallbacks(graph)
+  let conf = graph.config
+  wantMainModule(conf)
+  let systemFileIdx = fileInfoIdx(conf, conf.libpath / RelativeFile"system.nim")
+  let projectFile = if projectFileIdx == InvalidFileIDX: conf.projectMainIdx else: projectFileIdx
+  graph.importStack.add projectFile
+#[  if projectFile == systemFileIdx:
+    discard graph.compileModule(projectFile, {sfMainModule, sfSystemModule})
+  else:
+    graph.compileSystemModule()
+    discard graph.compileModule(projectFile, {sfMainModule})
+]#
+  discard graph.compileModule(projectFile, {sfMainModule})
+
 proc compileProject*(graph: ModuleGraph; projectFileIdx = InvalidFileIDX) =
   connectCallbacks(graph)
   let conf = graph.config

@@ -91,7 +91,11 @@ within the [doc/koch.rst](doc/koch.rst) file.
 
 Bear in mind that this is work in progress, but the usage will be something along these lines. 
 
-``bin/nim dex fib.nim`` 
+``bin/nim dex --skipcfg fib.nim`` 
+
+In order to get as few moving parts as possible the standard library is not included when build DEX for the time being. 
+
+Furthermore to get to the bare essentials --skipcfg is recommended. This to get the minimal surface for implementing the DEX backend.
 
 Currently prints out a subset of the AST. More to come shortly!
 
