@@ -31,27 +31,6 @@ proc getReg(p: PProc, v: PIdent): string =
   let l = p.locals[id]
   return "v" & $l.reg0
 
-# proc genVarInit(p: PProc, v: PSym, n: PNode) =
-#   # TODO: super simplified for initial PoC
-#   if n.kind == nkIntLit:
-#     echo ".. const-wide/32 " & getReg(p, v) & ", " & $n.intVal
-
-# proc genVarStmt(p: PProc, n: PNode) =
-#   for i in countup(0, sonsLen(n) - 1):
-#     var a = n.sons[i]
-#     if a.kind != nkCommentStmt:
-#       if a.kind == nkVarTuple:
-#         discard
-#       #   let unpacked = lowerTupleUnpacking(p.module.graph, a, p.prc)
-#       #   genStmt(p, unpacked)
-#       else:
-#         assert(a.kind == nkIdentDefs)
-#         assert(a.sons[0].kind == nkSym)
-#         var v = a.sons[0].sym
-#         # if lfNoDecl notin v.loc.flags and sfImportc notin v.flags:
-#         #   genLineDir(p, a)
-#         genVarInit(p, v, a.sons[2])
-
 template dumpSons() {.dirty.} =
   for i in countup(0, sonsLen(n) - 1):
     match(p, n.sons[i], indent & " ")
@@ -62,14 +41,6 @@ proc match(p: PProc, n: PNode, indent: string) =
   case n.kind
   of nkStmtList, nkStmtListExpr, nkVarSection, nkEmpty, nkInfix:
     dumpSons()
-    # let isExpr = not isEmptyType(n.typ)
-    # for i in countup(0, sonsLen(n) - 1 - isExpr.ord):
-    #   # genStmt(p, n.sons[i])
-    #   gen(p, n.sons[i])
-    # # if isExpr:
-    # #   gen(p, lastSon(n), r)
-    # # echo repr(n)
-  # of nkVarSection, nkLetSection: genVarStmt(p, n)
   of nkIdent:
     echo indent, " .ident.s=", repr(n.ident.s)
   of nkIntLit:
