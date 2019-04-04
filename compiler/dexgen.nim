@@ -1,16 +1,70 @@
 import
-  ast,passes,lineinfos
+  ast, passes, lineinfos, tables, hashes
 
 # debug 
 import typetraits
 
 from modulegraphs import ModuleGraph, PPassContext
 
-type TDEXGen = object of PPassContext
-  module: PSym
-  graph: ModuleGraph
+type
+  BModule = ref TDEXGen
+  TDEXGen = object of PPassContext
+    module: PSym
+    graph: ModuleGraph
 
-type BModule = ref TDEXGen
+  PVar = ref object
+    ## Info about a local variable
+    reg0: int  # 1st Dalvik register used by var; for wide types, reg0+1 is implicitly also used
+
+  PProc = ref TProc
+  TProc = object
+    # prc: PSym                # the Nim proc that this DEX proc belongs to
+    nextReg: int               # index of the first register not matched to a variable yet
+    locals: Table[string, PVar]  # local variables
+
+proc getReg(p: PProc, v: PSym): string =
+  let id = v.name.s
+  if not p.locals.contains(id):
+    p.locals[id] = PVar(reg0: p.nextReg)
+    inc(p.nextReg)
+  let l = p.locals[id]
+  return "v" & $l.reg0
+
+proc genVarInit(p: PProc, v: PSym, n: PNode) =
+  # TODO: super simplified for initial PoC
+  if n.kind == nkIntLit:
+    echo ".. const-wide/32 " & getReg(p, v) & ", " & $n.intVal
+
+proc genVarStmt(p: PProc, n: PNode) =
+  for i in countup(0, sonsLen(n) - 1):
+    var a = n.sons[i]
+    if a.kind != nkCommentStmt:
+      if a.kind == nkVarTuple:
+        discard
+      #   let unpacked = lowerTupleUnpacking(p.module.graph, a, p.prc)
+      #   genStmt(p, unpacked)
+      else:
+        assert(a.kind == nkIdentDefs)
+        assert(a.sons[0].kind == nkSym)
+        var v = a.sons[0].sym
+        # if lfNoDecl notin v.loc.flags and sfImportc notin v.flags:
+        #   genLineDir(p, a)
+        genVarInit(p, v, a.sons[2])
+
+proc gen(p: PProc, n: PNode #[, r: var TCompRes]# ) =
+  ## Main code generation "switch" procedure; based on gen() in jsgen.nim
+  case n.kind
+  of nkStmtList, nkStmtListExpr:
+    let isExpr = not isEmptyType(n.typ)
+    for i in countup(0, sonsLen(n) - 1 - isExpr.ord):
+      # genStmt(p, n.sons[i])
+      gen(p, n.sons[i])
+    # if isExpr:
+    #   gen(p, lastSon(n), r)
+    # echo repr(n)
+  of nkVarSection, nkLetSection: genVarStmt(p, n)
+  else:
+    echo n.kind
 
 proc newModule(g: ModuleGraph; module: PSym): BModule =
   new(result)
@@ -31,6 +85,21 @@ proc dexOpen(graph: ModuleGraph; module: PSym): PPassContext =
   result = newModule(graph,module)
 
 proc dexProcess(b: PPassContext, n: PNode): PNode =
+  # NOTES - various notes & discoveries made by reading the compiler code:
+  # - hcr = Hot Code Reloading (most probably)
+  # - PNode - type of Nim AST nodes
+  # - helper command for faster compilation:
+  #    $ compiler/nim0 c --nimcache:nimcache/d_linux_amd64 compiler/nim.nim
+  #    $ compiler/nim1 dex --skipcfg arithm.nim
+  #
+  # jsgen.nim:
+  # - entry point call path to gen(): myProcess() -> genModule() -> genStmt() -> gen()
+
+  var p = PProc(
+    locals: initTable[string, PVar](),
+  )
+  gen(p, n)
+
 #  echo n.kind
 #  echo "@" & $n.info.line & ":" & $n.info.col
 
