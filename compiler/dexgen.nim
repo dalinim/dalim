@@ -15,6 +15,7 @@ type
   PVar = ref object
     ## Info about a local variable
     reg0: int  # 1st Dalvik register used by var; for wide types, reg0+1 is implicitly also used
+    # TODO: store info about type of the variable
 
   PProc = ref TProc
   TProc = object
@@ -51,13 +52,16 @@ proc getReg(p: PProc, v: PIdent): string =
 #         #   genLineDir(p, a)
 #         genVarInit(p, v, a.sons[2])
 
+template dumpSons() {.dirty.} =
+  for i in countup(0, sonsLen(n) - 1):
+    match(p, n.sons[i], indent & " ")
+
 proc match(p: PProc, n: PNode, indent: string) =
   ## Main code generation "switch" procedure; inspired by gen() in jsgen.nim
   echo indent, n.kind
   case n.kind
   of nkStmtList, nkStmtListExpr, nkVarSection, nkEmpty, nkInfix:
-    for i in countup(0, sonsLen(n) - 1):
-      match(p, n.sons[i], indent & " ")
+    dumpSons()
     # let isExpr = not isEmptyType(n.typ)
     # for i in countup(0, sonsLen(n) - 1 - isExpr.ord):
     #   # genStmt(p, n.sons[i])
@@ -67,12 +71,20 @@ proc match(p: PProc, n: PNode, indent: string) =
     # # echo repr(n)
   # of nkVarSection, nkLetSection: genVarStmt(p, n)
   of nkIdent:
-    echo indent, " s=", repr(n.ident.s)
+    echo indent, " .ident.s=", repr(n.ident.s)
   of nkIntLit:
-    echo indent, " intVal=", n.intVal
+    echo indent, " .intVal=", n.intVal
   of nkIdentDefs:
     if n.sons[0].kind == nkIdent and n.sons[2].kind == nkIntLit:
       echo ".. const-wide/32 " & getReg(p, n.sons[0].ident) & ", " & $n.sons[2].intVal
+    elif n.sons[0].kind == nkIdent and n.sons[2].kind == nkInfix:
+      let op = n.sons[2]
+      if op.sons[0].kind == nkIdent and op.sons[0].ident.s == "*" and op.sons[1].kind == nkIdent and op.sons[2].kind == nkIdent:
+        echo ".. mul-int " & getReg(p, n.sons[0].ident) & ", " & getReg(p, op.sons[1].ident) & ", " & getReg(p, op.sons[2].ident)
+      else:
+        dumpSons()
+    else:
+      dumpSons()
   else:
     discard
 
@@ -112,6 +124,7 @@ proc dexProcess(b: PPassContext, n: PNode): PNode =
 
   result = n
 
+  echo "----"
   var p = PProc(
     locals: initTable[string, PVar](),
   )
